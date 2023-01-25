@@ -4,24 +4,19 @@ from gtts import gTTS
 
 from pdfminer.high_level import extract_text
 
+# Takes time to read the whole pages
 # with open("book.pdf", "rb") as file:
 #     text = extract_text(file)
 #     tts = gTTS(text)
 #     tts.save("book.mp3")
 
-
+# play sound
 # import sounddevice as sd
 # import soundfile as sf
 # data, fs = sf.read("book.mp3")
 # sd.play(data, fs)
 # status = sd.wait()
 
-
-# import fitz
-# pdf_document = fitz.open("book.pdf")
-# page = pdf_document[0]
-# highlight = page.add_highlight((10, 10, 50, 50))
-#
 
 # Read page by page's number [5] page number five
 # from PyPDF2 import PdfReader
@@ -77,10 +72,23 @@ class MyDialog(QDialog):
     def stop_audio(self):
         self.engine.stop()
 
+    # def highlight(self):
+    #     cursor = self.textEdit.textCursor()
+    #     cursor.select(QTextCursor.LineUnderCursor)
+    #     cursor.setCharFormat(QTextCharFormat().setBackground(Qt.yellow))
+
+    # def highlight_word_by_word(self):
+
+    # This function will iterate through the words in the text, move the cursor to
+    # each word, select the word, and set the background color to yellow.
     def highlight(self):
-        cursor = self.textEdit.textCursor()
-        cursor.select(QTextCursor.LineUnderCursor)
-        cursor.setCharFormat(QTextCharFormat().setBackground(Qt.yellow))
+        words = self.textEdit.toPlainText().split(" ")
+        for i, word in enumerate(words):
+            cursor = self.textEdit.textCursor()
+            cursor.movePosition(QTextCursor.Start)
+            cursor.movePosition(QTextCursor.NextWord, QTextCursor.MoveAnchor, i)
+            cursor.movePosition(QTextCursor.NextWord, QTextCursor.KeepAnchor, 1)
+            cursor.setCharFormat(QTextCharFormat().setBackground(Qt.yellow))
 
 
 app = QApplication(sys.argv)
