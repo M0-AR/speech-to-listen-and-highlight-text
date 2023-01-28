@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Text Highlighter</title>
+  <style>
+    /* Style for the text */
+    #text {
+      font-size: 20px;
+      margin: 20px;
+    }
+
+    /* Style for the highlighted word */
+    .highlight {
+      background-color: yellow;
+    }
+  </style>
+</head>
+<body>
+  <div id="text">This is an example of highlighting text as it is spoken.</div>
+
+  <script>
+    // Get a reference to the text element
+    var text = document.getElementById("text");
+
+    // Get the text as a string
+    var words = text.innerText.split(" ");
+
+    // Initialize the current word index
+    var currentWord = 0;
+
+    // Function to highlight the current word
+    function highlight() {
+      // Remove the highlight class from the previous word
+      var previousWord = text.getElementsByClassName("highlight")[0];
+      if (previousWord) {
+        previousWord.classList.remove("highlight");
+      }
+
+      // Get the current word element
+      var currentWordElement = text.getElementsByTagName("span")[currentWord];
+
+      // Add the highlight class to the current word
+      currentWordElement.classList.add("highlight");
+
+      // Speak the current word
+      var word = currentWordElement.innerText;
+      speechSynthesis.speak(new SpeechSynthesisUtterance(word));
+
+      // Increment the current word index
+      currentWord++;
+
+      // If all words have been spoken, stop
+      if (currentWord == words.length) {
+        clearInterval(intervalId);
+      }
+    }
+
+    // Split the text into words and wrap each word in a span element
+    text.innerHTML = words.map(function(word) {
+      return "<span>" + word + "</span>";
+    }).join(" ");
+
+    // Set an interval to highlight the next word every 2 seconds
+    var intervalId = setInterval(highlight, 2000);
+  </script>
+</body>
+</html>
