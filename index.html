@@ -1,67 +1,56 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Text Highlighter</title>
-  <style>
-    /* Style for the text */
-    #text {
-      font-size: 20px;
-      margin: 20px;
-    }
+  <head>
+    <title>Text Highlighter</title>
+    <style>
+      .highlight {
+        background-color: yellow;
+      }
+    </style>
+  </head>
+  <body>
+    <p id="text">This is an example of highlighting text as it is read out loud.</p>
+    <button onclick="startHighlighting()">Start Highlighting</button>
+    <button onclick="stopHighlighting()">Stop Highlighting</button>
+    <script>
+      var text = document.getElementById("text");
+      var words = text.innerHTML.split(" ");
+      var i = 0;
+      var intervalId;
 
-    /* Style for the highlighted word */
-    .highlight {
-      background-color: yellow;
-    }
-  </style>
-</head>
-<body>
-  <div id="text">This is an example of highlighting text as it is spoken.</div>
+      // wrap each word in a span element
+      text.innerHTML = words.map(word => `<span class="word">${word}</span>`).join(" ");
+      words = document.getElementsByClassName("word");
 
-  <script>
-    // Get a reference to the text element
-    var text = document.getElementById("text");
-
-    // Get the text as a string
-    var words = text.innerText.split(" ");
-
-    // Initialize the current word index
-    var currentWord = 0;
-
-    // Function to highlight the current word
-    function highlight() {
-      // Remove the highlight class from the previous word
-      var previousWord = text.getElementsByClassName("highlight")[0];
-      if (previousWord) {
-        previousWord.classList.remove("highlight");
+      function startHighlighting() {
+        //create a new speech synthesis utterance object
+        var speech = new SpeechSynthesisUtterance(text.innerHTML);
+        //when the speech synthesis ends
+        speech.onend = function() {
+          stopHighlighting();
+        }
+        //when a boundary is reached during speech synthesis
+        speech.onboundary = function(event) {
+          highlight(event.charIndex);
+        }
+        window.speechSynthesis.speak(speech);
       }
 
-      // Get the current word element
-      var currentWordElement = text.getElementsByTagName("span")[currentWord];
-
-      // Add the highlight class to the current word
-      currentWordElement.classList.add("highlight");
-
-      // Speak the current word
-      var word = currentWordElement.innerText;
-      speechSynthesis.speak(new SpeechSynthesisUtterance(word));
-
-      // Increment the current word index
-      currentWord++;
-
-      // If all words have been spoken, stop
-      if (currentWord == words.length) {
+      function stopHighlighting() {
         clearInterval(intervalId);
+        words[i-1].classList.remove("highlight");
       }
-    }
 
-    // Split the text into words and wrap each word in a span element
-    text.innerHTML = words.map(function(word) {
-      return "<span>" + word + "</span>";
-    }).join(" ");
-
-    // Set an interval to highlight the next word every 2 seconds
-    var intervalId = setInterval(highlight, 2000);
-  </script>
-</body>
+      function highlight() {
+        if (i > 0) {
+          words[i-1].classList.remove("highlight");
+        }
+        words[i].classList.add("highlight");
+        i++;
+        if (i == words.length) {
+          stopHighlighting();
+        }
+      }
+    </script>
+  </body>
 </html>
